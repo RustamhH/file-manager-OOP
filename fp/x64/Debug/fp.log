@@ -1,0 +1,10 @@
+﻿  fp.cpp
+D:\OOP C++\fp\fp\Classes.h(52,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(62,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(82,21): warning C4244: 'argument': conversion from 'std::streamoff' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(125,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(133,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(169,11): warning C4244: 'return': conversion from 'intptr_t' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(190,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(202,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  fp.vcxproj -> D:\OOP C++\fp\x64\Debug\fp.exe
