@@ -208,6 +208,7 @@ public:
 		else sort(folderItems.begin(), folderItems.end(), sizeN);
 	}
 	
+	
 
 	~Folder()
 	{
@@ -311,6 +312,10 @@ public:
 	}
 	void cd_backwards() {
 		string tempCurrent = currentRoot.substr(0, currentRoot.rfind("\\"));
+		if (tempCurrent == "C:\\Users") {
+			cout << "Not availible" << endl;
+			return;
+		}
 		try {
 			if(currentFolder->setItems(tempCurrent)==0) currentRoot = tempCurrent;
 		}
@@ -400,7 +405,6 @@ public:
 		cout << "rmdir --> Deletes selected folder" << endl;
 		cout << "cd --> Changes the current directory" << endl;
 		cout << "cd.. --> Changes the current directory backwards" << endl;
-		cout << "cd/ --> Changes the current directory to C:\\" << endl;
 		cout << "dir --> Displays all content of directories" << endl;
 		cout << "open --> Opens selected directory" << endl;
 		cout << "type_nul --> Creates a new file" << endl;
