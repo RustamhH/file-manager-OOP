@@ -112,7 +112,7 @@ class Folder:public Item
 	vector<Item*>folderItems;
 public:
 	// Getter
-	vector<Item*>& getFolderItems() { return folderItems; }
+	vector<Item*> getFolderItems() { return folderItems; }
 
 	// Methods
 	void Create(string newName) override {
@@ -347,6 +347,7 @@ public:
 				if (dynamic_cast<File*>(i) != NULL) {
 					try { (dynamic_cast<File*>(i))->Read(); }
 					catch (const exception& ex) { cout << ex.what() << endl; }
+					return;
 				}
 			}
 		}
@@ -380,11 +381,9 @@ public:
 					cout << "Enter text:\n";
 					getline(cin, text);
 					try { (dynamic_cast<File*>(i))->writetoFile(text); }
-					catch (const exception& ex) {
-						cout << ex.what() << endl;
-						return;
-					}
+					catch (const exception& ex) {cout << ex.what() << endl;}
 					currentFolder->setItems(currentRoot);
+					return;
 				}
 			}
 		}
@@ -401,11 +400,9 @@ public:
 					getline(cin, text);
 					if (dynamic_cast<File*>(i) != NULL) {
 						try { (dynamic_cast<File*>(i))->appendtoFile(text); }
-						catch (const exception& ex) {
-							cout << ex.what() << endl;
-							return;
-						}
+						catch (const exception& ex) {cout << ex.what() << endl;}
 						currentFolder->setItems(currentRoot);
+						return;
 					}
 				}
 			}
