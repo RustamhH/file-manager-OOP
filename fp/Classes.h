@@ -9,8 +9,9 @@ class Item
 {
 	string _name = "";
 	int _attributes = 0;
-	int _size = 0;
+	size_t _size = 0;
 public:
+	// Pure Virtual Methods
 	virtual void Create(string newName) = 0;
 	virtual void Print() = 0 {
 		cout << "Name: " << _name << endl;
@@ -19,17 +20,18 @@ public:
 	};
 	virtual void Rename(string newName) = 0;
 	virtual void Delete() = 0;
-	virtual void CalculateSize() = 0;
+	virtual ~Item() = 0 {};
+	// Getters
 	int getAttributes() const { return _attributes; }
 	int getSize() const { return _size; }
 	string getName() const { return _name; }
+	// Setters
 	void setAttributes(int newAtrribute) { this->_attributes = newAtrribute; }
 	void setName(string name) { this->_name = name; }
 	void setSize(int newSize) { this->_size = newSize; }
-	virtual ~Item() = 0 {};
 };
 
-// Predicats
+// Predicats for Sort
 
 bool sizeS(const Item* it1, const Item* it2) {
 	return it1->getSize() < it2->getSize();
@@ -39,18 +41,19 @@ bool sizeN(const Item* it1, const Item* it2) {
 }
 
 
+// File Class
 
 class File:public Item
 {
 public:
 
+	// Methods
 	void Create(string newName) override{
 		ofstream file(newName.c_str(),ios::app);
 		if (!file) throw BadDirCreate();
 		if (!file.is_open()) throw BadDirOpen();
 		this->setName(newName);
 		this->setAttributes(newName.size());
-		this->CalculateSize();
 		file.close();
 	}
 	void Print() override {
@@ -74,21 +77,12 @@ public:
 		}
 		throw BadDirRemove();
 	}
-	void CalculateSize() override  {
-		ifstream file(getName().c_str(), ios::binary);
-		if (!file) throw BadDirCreate();
-		if (!file.is_open()) throw BadDirOpen();
-		file.seekg(0, ios::end);
-		setSize(file.tellg());
-		file.close();
-	}
 	void writetoFile(string text)  {
 		 ofstream file(getName().c_str(), ios::out);
 		 if (!file) throw BadDirCreate();
 		 if (!file.is_open()) throw BadDirOpen();
 		 file << text<<endl;
 		 file.close();
-		 CalculateSize();
 	}
 	void appendtoFile(string text) {
 		 ofstream file(getName().c_str(), ios::app);
@@ -96,7 +90,6 @@ public:
 		 if (!file.is_open()) throw BadDirOpen();
 		 file << text;
 		 file.close();
-		 CalculateSize();
 	}
 	void Read() {
 		ifstream file(getName().c_str(), ios::in);
@@ -116,9 +109,12 @@ public:
 
 class Folder:public Item
 {
-public:
 	vector<Item*>folderItems;
+public:
+	// Getter
+	vector<Item*>& getFolderItems() { return folderItems; }
 
+	// Methods
 	void Create(string newName) override {
 		if (_mkdir(newName.c_str()) != -1) {
 			this->setName(newName);
@@ -153,7 +149,7 @@ public:
 		}
 		throw BadDirRemove();
 	}
-	void CalculateSize() override {
+	void CalculateSize()  {
 		int total = 0;
 		for (auto& i : folderItems)
 		{
@@ -188,7 +184,7 @@ public:
 			string dataName = location + "\\" + string(file_info.name);
 			i1->setName(dataName);
 			i1->setAttributes(dataName.size());
-			i1->CalculateSize();
+			i1->setSize(file_info.size);
 			if (file_info.attrib & _A_SUBDIR) {
 				dynamic_cast<Folder*>(i1)->setItems(dataName,true);
 			}
@@ -207,9 +203,8 @@ public:
 		if(isSize) sort(folderItems.begin(), folderItems.end(), sizeS);
 		else sort(folderItems.begin(), folderItems.end(), sizeN);
 	}
-	
-	
 
+	// Destructor
 	~Folder()
 	{
 		for (auto& i : folderItems){delete i;}
@@ -224,11 +219,16 @@ class FileManager
 	string currentRoot;
 	Folder* currentFolder;
 public:
-	Folder* getCurrentFolder() { return currentFolder; }
-	string getCurrentRoot() { return currentRoot; }
+	// Default c-tor
 	FileManager() : currentFolder(new Folder()),currentRoot("C:\\Users\\Public\\Documents") {
 		currentFolder->setItems(currentRoot);
 	}
+	
+	// Getters
+	Folder* getCurrentFolder() { return currentFolder; }
+	string getCurrentRoot() { return currentRoot; }
+	
+	// Methods
 	void mkdir(string newName) {
 		Folder* f = new Folder();
 		try {
@@ -238,14 +238,14 @@ public:
 			cout << ex.what() << endl;
 			return;
 		}
-		currentFolder->folderItems.push_back(f);
+		currentFolder->getFolderItems().push_back(f);
 		currentFolder->setItems(currentRoot);
 		delete f;
 
 	}
 	void rmdir(string deleteName) {
 		deleteName = currentRoot + "\\" + deleteName;
-		for (auto& i : currentFolder->folderItems)
+		for (auto& i : currentFolder->getFolderItems())
 		{
 			if (i->getName() == deleteName) {
 				try {
@@ -271,13 +271,13 @@ public:
 			cout << ex.what() << endl;
 			return;
 		}
-		currentFolder->folderItems.push_back(f);
+		currentFolder->getFolderItems().push_back(f);
 		currentFolder->setItems(currentRoot);
 		delete f;
 	}
 	void rename(string oldName,string newName) {
 		newName = currentRoot + "\\" + newName;
-		for (auto& i : currentFolder->folderItems)
+		for (auto& i : currentFolder->getFolderItems())
 		{
 			if (i->getName() == currentRoot + "\\" + oldName) {
 				try {
@@ -312,7 +312,7 @@ public:
 	}
 	void cd_backwards() {
 		string tempCurrent = currentRoot.substr(0, currentRoot.rfind("\\"));
-		if (tempCurrent == "C:\\Users") {
+		if (tempCurrent == "C:") {
 			cout << "Not availible" << endl;
 			return;
 		}
@@ -325,7 +325,7 @@ public:
 	}
 	void move(string standerName, string moverName) {
 		bool check1 = false;
-		for (auto& i : currentFolder->folderItems) {if (i->getName() == currentRoot + "\\" + standerName) check1 = true;}
+		for (auto& i : currentFolder->getFolderItems()) {if (i->getName() == currentRoot + "\\" + standerName) check1 = true;}
 		if (!check1) {
 			try { throw BadDirMove(); }
 			catch (const exception& ex) { 
@@ -341,21 +341,23 @@ public:
 		ShellExecuteA(0, 0, file.c_str(), 0, 0, SW_SHOW);
 	}
 	void type(string fileName) {
-		for (auto& i : currentFolder->folderItems)
+		for (auto& i : currentFolder->getFolderItems())
 		{
 			if (i->getName() == currentRoot + "\\"+ fileName) {
-				try {(dynamic_cast<File*>(i))->Read();}
-				catch (const exception& ex) { cout << ex.what() << endl; }
+				if (dynamic_cast<File*>(i) != NULL) {
+					try { (dynamic_cast<File*>(i))->Read(); }
+					catch (const exception& ex) { cout << ex.what() << endl; }
+				}
 			}
 		}
 		try { throw BadDirOpen(); }
 		catch (const exception& ex) { cout << ex.what() << endl;}
 	}
 	void compare(string name1, string name2) {
-		for (auto& i :currentFolder->folderItems)
+		for (auto& i :currentFolder->getFolderItems())
 		{
 			if (i->getName() == currentRoot + "\\" + name1) {
-				for (auto& j : currentFolder->folderItems)
+				for (auto& j : currentFolder->getFolderItems())
 				{
 					if (j->getName() == currentRoot + "\\" + name2) {
 						if (i->getSize() > j->getSize()) cout << name1 << " is larger in size" << endl;
@@ -370,28 +372,42 @@ public:
 		catch (const exception& ex) { cout << ex.what() << endl; }
 	}
 	void write(string fileName) {
-		for (auto& i : currentFolder->folderItems)
+		for (auto& i : currentFolder->getFolderItems())
 		{
 			if (i->getName() == currentRoot + "\\" + fileName) {
-				string text;
-				cout << "Enter text:\n";
-				getline(cin, text);
-				try { (dynamic_cast<File*>(i))->writetoFile(text); }
-				catch (const exception& ex) { cout << ex.what() << endl; }
+				if (dynamic_cast<File*>(i) != NULL) {
+					string text;
+					cout << "Enter text:\n";
+					getline(cin, text);
+					try { (dynamic_cast<File*>(i))->writetoFile(text); }
+					catch (const exception& ex) {
+						cout << ex.what() << endl;
+						return;
+					}
+					currentFolder->setItems(currentRoot);
+				}
 			}
 		}
 		try { throw BadDirOpen(); }
 		catch (const exception& ex) { cout << ex.what() << endl; }
 	}
 	void append(string fileName) {
-		for (auto& i : currentFolder->folderItems)
+		for (auto& i : currentFolder->getFolderItems())
 		{
 			if (i->getName() == currentRoot + "\\" + fileName) {
-				cout << "Enter text:\n";
-				string text;
-				getline(cin, text);
-				try { (dynamic_cast<File*>(i))->appendtoFile(text); }
-				catch (const exception& ex) { cout << ex.what() << endl; }
+				if (dynamic_cast<File*>(i) != NULL) {
+					cout << "Enter text:\n";
+					string text;
+					getline(cin, text);
+					if (dynamic_cast<File*>(i) != NULL) {
+						try { (dynamic_cast<File*>(i))->appendtoFile(text); }
+						catch (const exception& ex) {
+							cout << ex.what() << endl;
+							return;
+						}
+						currentFolder->setItems(currentRoot);
+					}
+				}
 			}
 		}
 		try { throw BadDirOpen(); }
@@ -422,6 +438,8 @@ public:
 		cout << "exit --> Closes the terminal" << endl;
 	}
 
+
+	// Destructor
 	~FileManager() {delete currentFolder;}
 
 };
