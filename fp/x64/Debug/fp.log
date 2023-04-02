@@ -6,5 +6,5 @@ D:\OOP C++\fp\fp\Classes.h(121,1): warning C4267: 'argument': conversion from 's
 D:\OOP C++\fp\fp\Classes.h(129,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 D:\OOP C++\fp\fp\Classes.h(165,11): warning C4244: 'return': conversion from 'intptr_t' to 'int', possible loss of data
 D:\OOP C++\fp\fp\Classes.h(186,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\OOP C++\fp\fp\Classes.h(198,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\OOP C++\fp\fp\Classes.h(193,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   fp.vcxproj -> D:\OOP C++\fp\x64\Debug\fp.exe

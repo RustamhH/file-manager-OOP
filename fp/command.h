@@ -21,6 +21,9 @@ namespace FM {
 			else if (command == "cd..") {
 				m1.cd_backwards();
 			}
+			else if (command == "cd/") {
+				m1.cdallback();
+			}
 			else if (command == "dir") {
 				m1.dir_s();
 			}

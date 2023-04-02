@@ -43,6 +43,7 @@ namespace FM {
 				cout << "Enter Dir Name: ";
 				getline(cin, new_);
 				if (new_ == "..") m2.cd_backwards();
+				else if (new_ == "/") m2.cdallback();
 				else m2.cd(new_);
 			}
 			else if (choice == 6) {

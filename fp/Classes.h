@@ -157,7 +157,7 @@ public:
 		}
 		setSize(total);
 	}
-	int setItems(string location,bool isSubfolder=false) {
+	int setItems(string location) {
 		_finddata_t file_info;
 		intptr_t handle = _findfirst((location + "/*").c_str(), &file_info);
 
@@ -185,15 +185,10 @@ public:
 			i1->setName(dataName);
 			i1->setAttributes(dataName.size());
 			i1->setSize(file_info.size);
-			if (file_info.attrib & _A_SUBDIR) {
-				dynamic_cast<Folder*>(i1)->setItems(dataName,true);
-			}
-
 			this->folderItems.push_back(i1);
 
 		} while (_findnext(handle, &file_info) == 0);
 		this->CalculateSize();
-		if (isSubfolder) this->folderItems.clear();
 		this->setName(location);
 		this->setAttributes(location.size());
 		_findclose(handle);
@@ -312,12 +307,17 @@ public:
 	}
 	void cd_backwards() {
 		string tempCurrent = currentRoot.substr(0, currentRoot.rfind("\\"));
-		if (tempCurrent == "C:") {
-			cout << "Not availible" << endl;
-			return;
-		}
 		try {
 			if(currentFolder->setItems(tempCurrent)==0) currentRoot = tempCurrent;
+		}
+		catch (const exception& ex) {
+			cout << ex.what() << endl;
+		}
+	}
+	void cdallback() {
+		string tempCurrent = "C:";
+		try {
+			if (currentFolder->setItems(tempCurrent) == 0) currentRoot = tempCurrent;
 		}
 		catch (const exception& ex) {
 			cout << ex.what() << endl;
@@ -418,6 +418,7 @@ public:
 		cout << "rmdir --> Deletes selected folder" << endl;
 		cout << "cd --> Changes the current directory" << endl;
 		cout << "cd.. --> Changes the current directory backwards" << endl;
+		cout << "cd/ --> Changes the current directory to C:" << endl;
 		cout << "dir --> Displays all content of directories" << endl;
 		cout << "open --> Opens selected directory" << endl;
 		cout << "type_nul --> Creates a new file" << endl;
